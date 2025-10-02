@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>FAQ Chatbot</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+  <div id="chatbox">
+    <h2>FAQ Chatbot</h2>
+    <div id="messages"></div>
+    <form id="chat-form">
+      <input type="text" id="user-input" placeholder="Ask me something..." style="width: 80%; padding: 10px;">
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("user-input");
+    const messages = document.getElementById("messages");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = input.value;
+      if (!msg) return;
+
+      messages.innerHTML += `<div class="msg user"><b>You:</b> ${msg}</div>`;
+      input.value = "";
+
+      const res = await fetch("/get", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "msg=" + encodeURIComponent(msg)
+      });
+      const data = await res.json();
+
+      messages.innerHTML += `<div class="msg bot"><b>Bot:</b> ${data.response}</div>`;
+      messages.scrollTop = messages.scrollHeight;
+    });
+  </script>
+</body>
+
+</html>
